@@ -1,0 +1,43 @@
+Programmer  :: Arko Sharma
+Roll        :: 111601002
+Date        :: 06.08.2018
+
+------------------
+Problem 2 ::
+------------------
+        
+ Environment is defined by 4 state variables :
+
+	loc_x , loc_y     : static location of dirty block
+	agent_x , agent_y : location of agent 
+
+
+ The agent class has 2 states : 
+	
+	  x_steps : no of x moves to make
+	  y_steps : no of y moves to make  
+
+ Traversal :
+
+	1. The agent moves along the perimeter of a square to look for the destination.
+	   The length of a side of square is measured by the number of blocks( grids ) per side.
+	2. Once a cycle is complete, the length of square is incremented by 2 blocks.
+	   The newly formed square just bounds the earlier square.
+	3. Initial length ( no of grids along the side ) of the square is 1.
+	   It starts at the initial location of the cleaner agent.
+      	   It is a complete cycle by itself.
+
+
+
+--------------------
+Problem 3 ::
+--------------------
+Class WordID has 1 state variable that indicates whether the current character is a
+starting of a word or not. If the current character is the starting of a word,
+and the current state indicates that no word is currently running, then the counter is incremented by 1 .Additionally the state is set to indicate a word is currently running.
+In all other cases , the counter is not incremented and the state is set
+to indicate that no word is running.
+
+
+The definition of word used here is a group of english alphabets with no other 
+special characters in between . Any other character is used as a delimiter.
