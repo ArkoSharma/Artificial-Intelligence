@@ -1,0 +1,36 @@
+Programmer  - Arko Sharma
+Roll No     -  11161002
+Date        -  17/08/2018 
+
+
+The problem has been implemented using the logic as follows :
+
+
+
+1. There are two classes - one for the road-network and other for the vehicles.
+   The necessary properties required for the problem are maintained as attributes of the respective classes.
+   
+
+2. The network has the connectivity stored as an adj matrix and maintains a load-matrix having the current number
+   of vehicles in each road.
+
+   In this setting an event takes place when a vehicle leaves a particular road
+   and enters a different road. The transition between roads is instantaneous.
+
+   A Priority Queue is used to find out which event takes place next. This queue is initialized with the starting times
+   of the vehicles. Every time a transition occurs ,  the "Event" member function is executed.
+   
+   This function removes the vehicle which is to be relocated from the queue, modifies the parameters
+   of the vehicle, calculates the time for next departure and inserts it back into the queue.In case the vehicle has
+   completed its journey,it is not re-inserted into the queue.  
+
+      
+3.Each vehicle has a numeric id, departure time, a count of the roads it has travelled and the
+  sequence of vertices which constitutes its predefined path. 
+  
+  The Vehicle class implements an Update function to redefine the parameters as needed and a comparator that
+  enables sorting by the "departure-time" attribute.
+  
+4.The Event function of the network is executed until all the vehicles complete their jouney.At this point, the queue becomes
+  empty for the first time since beginning and program exits.
+
