@@ -1,0 +1,28 @@
+Programmer  - Arko Sharma
+Roll No     -  11161002
+Date        -  17/08/2018 
+
+
+The problem has been implemented using the logic as follows :
+
+
+
+1. There are two classes - one for the grid environment and other for the moving agent.
+   The necessary properties required for the problem are maintained as attributes of the
+   respective classes.
+   
+
+2. The grid has the locations of the agent and the destination blocks as state variables.
+   Also it records the number of steps moved by the agent.
+ 
+   The environment has an utility function "reward" to which returns 1 if the agent
+   reaches the goal state and 0 for every other move.
+
+      
+3. The agent moves randomly in one of the 6 cardinal directions in 3-dimensions.
+   The move is generated randomly with numpy's random generator and passed to the
+   environment, which checks if it is legal or not and modifies the coordinates of
+   the agent accordingly.
+
+4. The problem is solved for a number of cases and finally the mean and the variance
+   are returned.
