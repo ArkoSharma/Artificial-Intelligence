@@ -66,6 +66,10 @@ class Environment:
           else:
               return 1
 
+      """ 
+      Runs a BFS with 4 moves possible along the four directions : up,down,left,right.
+      Returns the number of steps required to search the goal cell.
+      """
 
       def BFS_4(self):
  
@@ -102,7 +106,7 @@ class Environment:
           for i in range(len(explored_list)):
               current = explored_list[i]
               temp[current[0]][current[1]] = 1
-	      print("Visiting {}".format(current))
+              print("Visiting {}".format(current))
               print temp
               print("########################")    
 
@@ -150,14 +154,14 @@ class Environment:
           for i in range(len(explored_list)):
               current = explored_list[i]
               temp[current[0]][current[1]] = 1
-	      print("Visiting {}".format(current))
+              print("Visiting {}".format(current))
               print temp
               print("########################")    
 
           return ("For BFS with 8 actions, Goal reached in {} steps.".format(len(explored_list)))
 
 
-myenv = Environment(20)
+myenv = Environment(15)
 msg4_ = (myenv.BFS_4())
 msg8_ = (myenv.BFS_8())
 print msg4_
