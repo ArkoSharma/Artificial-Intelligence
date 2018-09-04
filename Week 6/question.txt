@@ -1,0 +1,10 @@
+Search Techniques.
+
+1. For the first problem create a grid with starting position at the lower left corner and ending position in the upper right.
+   The grid should contain some blocked cells ( diagonally oriented ) .
+
+2. Run BFS with 4 actions (Left,Right,Up,Down) on the grid and report the number of steps required to reach the goal.
+   Modify and compare number of steps with 8 actions - allowing diagonal movements.
+
+3. Secondly run A* with two different heuristics : the Euclidean distance and Manhattan distance and report the number of steps
+   required to search the goal cell.
