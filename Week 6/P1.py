@@ -17,14 +17,14 @@ class Environment:
       The goal cell is the upper right corner.
       The environment records the number of steps taken to search the goal.
 
-      There is an explored list which keeps track of the explored NODES of the program graph (denoted by the cell in which the agent is ).
+      There is an explored list which keeps track of the explored NODES of the program graph (denoted by the cell which is being explored currently ).
       """
  
 
       def __init__(self,dimension):
           
-	  self.dimension = dimension
-	  self.grid = np.zeros([dimension,dimension])
+          self.dimension = dimension
+          self.grid = np.zeros([dimension,dimension])
           self.goal_r = 0
           self.goal_c = dimension - 1
 	
@@ -40,6 +40,8 @@ class Environment:
           self.grid[0][1] = 0
           for i in range(dimension):
 	      print self.grid[i]          
+
+
       """ 
       Function to indicate whether a given action is valid, given the starting position
       """
@@ -65,9 +67,6 @@ class Environment:
               return 1
 
 
-      """
-      Runs a BFS to look for the goal-cell
-      """
       def BFS_4(self):
  
           dx = [1,0,-1,0]
@@ -86,23 +85,18 @@ class Environment:
                   explored_list.append(s)
                   break    	                 
 
-
-	      for i in range (len(explored_list)):
-                  if( explored_list[i] == s ):
-                      explored = True
-                      break
-              if(not explored):
+	      # Expand if current cell has not already been explored
+              # This check is necessary because multiple instances of this cell could have been pushed when it was not explored
+              if  (s not in explored_list):
                   for i in range(4):
 	              if ( self.is_valid(s[0],s[1],dx[i],dy[i])):
                          #note that if the child is invalid OR EXPLORED BEFORE, then it is not pushed in the Queue
                          if  ( (s[0] + dx[i], s[1] + dy[i]) not in explored_list ):
          	             Q.put((s[0]+dx[i],s[1]+dy[i]))   	   
 
-              #after expanding all the children , mark the node as explored
-              explored_list.append(s)
-              if(explored):
-                  continue                            
-
+                  #after expanding all the children , mark the node as explored
+                  explored_list.append(s)
+              
 	  print("\nWith 4 Actions,Exploration takes place as follows : ")
           temp = np.zeros([self.dimension,self.dimension])
           for i in range(len(explored_list)):
@@ -116,16 +110,19 @@ class Environment:
 
 
       """ 
-      BFS with diagonal moves possible
+      Modified BFS with diagonal moves possible alongwith the four cardinal directions.
+      Returns the number of steps required to search the goal cell.
       """
       def BFS_8(self):
  
           dx = [1,0,-1,0,1,1,-1,-1]
           dy = [0,-1,0,1,1,-1,1,-1]
           explored_list = []
+          #starting location pushed into queue
           start = (self.dimension - 1,0)
           Q = Queue.Queue()
           Q.put(start)
+	  count = 0
           while(not (Q.empty())):
               
 	      s = Q.get()
@@ -135,24 +132,19 @@ class Environment:
               if (self.cost(s[0],s[1],0,0) == 0):
                   explored_list.append(s)
                   break    	                 
-
-
-	      for i in range (len(explored_list)):
-                  if( explored_list[i] == s ):
-                      explored = True
-                      break
-              if(not explored):
+             
+              # Expand if current cell has not already been explored
+              # This check is necessary because multiple instances of this cell could have been pushed when it was not explored
+              if  (s not in explored_list):
                   for i in range(8):
 	              if ( self.is_valid(s[0],s[1],dx[i],dy[i])):
                          #note that if the child is invalid OR EXPLORED BEFORE, then it is not pushed in the Queue
                          if  ( (s[0] + dx[i], s[1] + dy[i]) not in explored_list ):
          	             Q.put((s[0]+dx[i],s[1]+dy[i]))   	   
 
-              #after expanding all the children , mark the node as explored
-              explored_list.append(s)
-              if(explored):
-                  continue                            
-
+                  #after expanding all the children , mark the node as explored
+                  explored_list.append(s)
+              
 	  print("\nWith 8 Actions, Exploration takes place as follows : ")
           temp = np.zeros([self.dimension,self.dimension])
           for i in range(len(explored_list)):
@@ -164,7 +156,8 @@ class Environment:
 
           return ("For BFS with 8 actions, Goal reached in {} steps.".format(len(explored_list)))
 
-myenv = Environment(10)
+
+myenv = Environment(20)
 msg4_ = (myenv.BFS_4())
 msg8_ = (myenv.BFS_8())
 print msg4_
