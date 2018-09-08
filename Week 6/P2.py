@@ -4,7 +4,7 @@ Arko Sharma
 111601002
 
 Lab 6 :
-03-09-2018
+08-09-2018
          
 """
 import numpy as np
@@ -151,10 +151,10 @@ class Environment:
          
           path.append(current)
           path = path[::-1]
-          print ("For A-star with 4 actions and Euclidean dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
+          print ("\nFor A-star with 4 actions and Euclidean dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
           print (" Path :: ")
           print path
-          print ("length of path ={}".format(len(path)))
+          print ("length of path = {}".format(len(path)))
 
 
 
@@ -229,7 +229,7 @@ class Environment:
           print ("\nFor A-star with 8 actions and Euclidean dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
           print (" Path :: ")
           print path
-          print ("length of path ={}".format(len(path)))
+          print ("length of path = {}".format(len(path)))
 
 
 
@@ -301,10 +301,10 @@ class Environment:
          
           path.append(current)
           path = path[::-1]
-          print ("For A-star with 4 actions and Manhattan dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
+          print ("\nFor A-star with 4 actions and Manhattan dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
           print (" Path :: ")
           print path
-          print ("length of path ={}".format(len(path)))
+          print ("length of path = {}".format(len(path)))
 
 
 
@@ -379,7 +379,7 @@ class Environment:
           print ("\nFor A-star with 8 actions and Manhattan dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
           print (" Path :: ")
           print path
-          print ("length of path ={}".format(len(path)))
+          print ("length of path = {}".format(len(path)))
 
 myenv = Environment(20)
 myenv.A_star_4EuclideanHeuristic()
