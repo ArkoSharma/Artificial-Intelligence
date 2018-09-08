@@ -154,6 +154,8 @@ class Environment:
           print ("For A-star with 4 actions and Euclidean dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
           print (" Path :: ")
           print path
+          print ("length of path ={}".format(len(path)))
+
 
 
       """ 
@@ -227,8 +229,160 @@ class Environment:
           print ("\nFor A-star with 8 actions and Euclidean dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
           print (" Path :: ")
           print path
+          print ("length of path ={}".format(len(path)))
+
+
+
+      """ 
+      Runs A-star search algorithm with 4 movements where heuristic value is Manhattan distance 
+      """
+      def A_star_4ManhattanHeuristic(self):
+ 
+          dx = [1,0,-1,0]
+          dy = [0,-1,0,1]
+          explored_list = []
+          start = (self.dimension - 1,0)
+          Q = Queue.PriorityQueue()
+          #g - actual distance till now
+          INF = 1000000000
+          g =parent = [ [ INF for x in range (self.dimension)]  for y in range (self.dimension)] 
+
+          parent = [ [ (-1,-1) for x in range (self.dimension)]  for y in range (self.dimension)] 
+
+          # For the start state, g + h value is 0
+          # Push the source into the priority queue alongwith the g + h value
+          Q.put((0,start))
+          parent[start[0]][start[1]] = start
+          g[start[0]][start[1]] = 0
+          
+
+          # Dijkstra's algorithm run...
+          while(not (Q.empty())):
+
+              path = []
+	      pop = Q.get()
+              s = pop[1]
+              # the real distance of the popped vertex is stored in dist_s
+              dist_s = g[s[0]][s[1]] 
+              #check if the goal state has been reached
+              if (self.cost(s[0],s[1],0,0) == 0):
+                  explored_list.append(s)
+                  break    	                 
+
+	      # Expand if current cell has not already been explored
+              # This check is necessary because multiple instances of this cell could have been pushed when it was not explored
+              if  (s not in explored_list):
+                  for i in range(4):
+	              if ( self.is_valid(s[0],s[1],dx[i],dy[i])):
+                         #note that if the child is invalid OR EXPLORED BEFORE, then it is not pushed in the Queue
+                         if  ( (s[0] + dx[i], s[1] + dy[i]) not in explored_list ):
+                             
+                             #child's g-value is parent's distance plus 1
+                             g_child = dist_s + 1
+                             h_child = self.ManhattanDistance(s[0] + dx[i],s[1] + dy[i])
+                             
+                             # Add this child to the fringe if the new (g + h) value is less than earlier (g + h) value
+                             # Since h value is fixed, comparing only g-values
+                             if( g_child  < g[s[0]+dx[i]][s[1]+dy[i]] ):
+                                 parent[s[0] + dx[i]][s[1] + dy[i]] = s
+                                 # update the g-value (real distance)
+                                 g[s[0]+dx[i]][s[1]+dy[i]] = dist_s + 1                          
+                                 # push the child with g + h - value
+         	                 Q.put((g_child + h_child,(s[0]+dx[i],s[1]+dy[i])))   	   
+
+                  #after expanding all the children , mark the node as explored
+                  explored_list.append(s)
+                  
+          current = (self.goal_r,self.goal_c)
+          while(not (current == parent[current[0]][current[1]])):
+              
+              path.append(current) 
+              current = parent[current[0]][current[1]]
+         
+          path.append(current)
+          path = path[::-1]
+          print ("For A-star with 4 actions and Manhattan dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
+          print (" Path :: ")
+          print path
+          print ("length of path ={}".format(len(path)))
+
+
+
+      """ 
+      Runs A-star search algorithm with 8 movements where heuristic value is Manhattan distance 
+      """
+      def A_star_8ManhattanHeuristic(self):
+ 
+          dx = [1,0,-1,0,1,1,-1,-1]
+          dy = [0,-1,0,1,1,-1,1,-1]
+          explored_list = []
+          start = (self.dimension - 1,0)
+          Q = Queue.PriorityQueue()
+          #g - actual distance till now
+          INF = 1000000000
+          g =parent = [ [ INF for x in range (self.dimension)]  for y in range (self.dimension)] 
+
+          parent = [ [ (-1,-1) for x in range (self.dimension)]  for y in range (self.dimension)] 
+
+          # For the start state, g + h value is 0
+          # Push the source into the priority queue alongwith the g + h value
+          Q.put((0,start))
+          parent[start[0]][start[1]] = start
+          g[start[0]][start[1]] = 0
+          
+
+          # Dijkstra's algorithm run...
+          while(not (Q.empty())):
+
+              path = []
+	      pop = Q.get()
+              s = pop[1]
+              # the real distance of the popped vertex is stored in dist_s
+              dist_s = g[s[0]][s[1]] 
+              #check if the goal state has been reached
+              if (self.cost(s[0],s[1],0,0) == 0):
+                  explored_list.append(s)
+                  break    	                 
+
+	      # Expand if current cell has not already been explored
+              # This check is necessary because multiple instances of this cell could have been pushed when it was not explored
+              if  (s not in explored_list):
+                  for i in range(8):
+	              if ( self.is_valid(s[0],s[1],dx[i],dy[i])):
+                         #note that if the child is invalid OR EXPLORED BEFORE, then it is not pushed in the Queue
+                         if  ( (s[0] + dx[i], s[1] + dy[i]) not in explored_list ):
+                             
+                             #child's g-value is parent's distance plus 1
+                             g_child = dist_s + 1
+                             h_child = self.ManhattanDistance(s[0] + dx[i],s[1] + dy[i])
+                             
+                             # Add this child to the fringe if the new (g + h) value is less than earlier (g + h) value
+                             # Since h value is fixed, comparing only g-values
+                             if( g_child  < g[s[0]+dx[i]][s[1]+dy[i]] ):
+                                 parent[s[0] + dx[i]][s[1] + dy[i]] = s
+                                 # update the g-value (real distance)
+                                 g[s[0]+dx[i]][s[1]+dy[i]] = dist_s + 1                          
+                                 # push the child with g + h - value
+         	                 Q.put((g_child + h_child,(s[0]+dx[i],s[1]+dy[i])))   	   
+
+                  #after expanding all the children , mark the node as explored
+                  explored_list.append(s)
+                  
+          current = (self.goal_r,self.goal_c)
+          while(not (current == parent[current[0]][current[1]])):
+              
+              path.append(current) 
+              current = parent[current[0]][current[1]]
+         
+          path.append(current)
+          path = path[::-1]
+          print ("\nFor A-star with 8 actions and Manhattan dist. as heuristic, Goal reached in {} steps( defined as length of explored list).".format(len(explored_list)))
+          print (" Path :: ")
+          print path
+          print ("length of path ={}".format(len(path)))
 
 myenv = Environment(20)
 myenv.A_star_4EuclideanHeuristic()
 myenv.A_star_8EuclideanHeuristic()
-
+myenv.A_star_4ManhattanHeuristic()
+myenv.A_star_8ManhattanHeuristic()
