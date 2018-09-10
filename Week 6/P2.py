@@ -4,7 +4,7 @@ Arko Sharma
 111601002
 
 Lab 6 :
-10-09-2018
+03-09-2018
          
 """
 import numpy as np
@@ -339,7 +339,7 @@ class Environment:
              
               steps += 1
               path = []
-	      pop = Q.get()
+              pop = Q.get()
               s = pop[1]
               # the real distance of the popped vertex is stored in dist_s
               dist_s = g[s[0]][s[1]]
