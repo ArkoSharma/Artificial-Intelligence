@@ -1,0 +1,38 @@
+There are two types of movements, one with diagonal moves allowed and another without.
+The first type has an optimal path of length 2*(side length of grid) - 2
+and the latter has that of 2*(side length) - 1.
+
+
+The BFS programs have been implemented using an explored list as follows:: 
+    
+    1. As a node is popped from the queue, it is not immediately marked as visited.
+       First, if it is not already explored, all of its unvisited children are pushed to the queue.
+       Then it is marked as explored.
+
+    2. It is necessary to check whether the popped node is explored prior to expanding it as
+       multiple instances of this node could have been pushed to the queue when it was unexplored.
+       So exploring one instance would mean the other ones would be required to be discarded, for
+       which the check comes in handy.
+   
+    3. Since we are interested in finding the optimal path, we keep a "parent" matrix.
+       Also, while adding children to the queue, it is checked whether their parent has already been
+       set or not. This is necessary in the case where diagonal moves are allowed .
+       It's because a diagonal move could also have been done with 2 non-diagonal moves which would 
+       increase the measured distance.
+
+
+The A-Star programs have been implemented with PriorityQueue data structure with 2 heuristics : Euclidean distance and Manhattan Distance.
+
+    1. For both 4-actions and 8-actions, Euclidean Distance is a consistent heuristic which facilitated the use
+       of explored list to reduce the complexity of the search process.
+       Also in these cases, we could stop on reaching the goal state for the first time .
+       The value used for priority based search was ( g + h ) -- where "g" is the actual distance and "h" the heuristic one.
+    
+    2. Now for Manhattan distance, the heuristic is consistent only for the case with 4-actions.
+ 
+       With 8 - actions, the heuristic is not even admissible. So the search couldn't be stopped upon reaching the goal
+       state for the first time and had to be continued till the queue became empty.
+       Nor could the explored list be used.
+
+       Since the heuristic was not admissible, it should not have returned the optimal path but for the grid designed in the program,
+       an optimal path was actually found. 
