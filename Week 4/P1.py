@@ -3,14 +3,14 @@
 Arko Sharma
 111601002
 
-Lab 4 :: ( n-squared minus 1 puzzle )
+Lab 4 :: P1 : ( n-squared minus 1 puzzle )
          
 """
 
 import numpy as np
 class N2Puzzle:
       """ 
-      add description
+      Environment implementing the " n-squared - 1 " puzzle.
       
       """
       
@@ -93,6 +93,6 @@ class N2Puzzle:
           print("{}".format(self.board)) 
                            
 
-new_puzzle = N2Puzzle(2)
+new_puzzle = N2Puzzle(10)
 new_puzzle.show_parity()
             
