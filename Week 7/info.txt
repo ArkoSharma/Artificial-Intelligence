@@ -1,0 +1,21 @@
+"""
+
+Arko Sharma
+111601002
+
+10.09.2018
+AI Lab - 7
+"""
+
+Problem 1 
+ 
+        This problem uses A-star search to look for the least-time path between a given starting state and
+        a given goal state . There are two modes of transportation : bus (for which a budget is given that 
+        cannot be exceeded ) and a cycle. The speeds of bus and cycle are fixed and vary according to the congestion
+        that is given as an input.
+
+        Firstly, all the road distances are known as weights of a graph that represents the road network.
+        Using these distances, we run shortest path algorithm from all nodes of the graph as sources and the goal as the target.
+        
+        Now, we run A-star algorithm with the precomputed shortest distances as the heuristic function.
+        ...
