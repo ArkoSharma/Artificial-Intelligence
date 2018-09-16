@@ -1,7 +1,7 @@
 """
 Arko Sharma
 111601002
-Lab 5 :: ( n-squared minus 1 puzzle ) - Solution using BFS
+Lab 5 :: ( n-squared minus 1 puzzle ) - Solution using BFS.
          
 """
 
