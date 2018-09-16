@@ -1,0 +1,32 @@
+"""
+Arko Sharma
+111601002
+Lab 5 :: ( n-squared minus 1 puzzle ) - Solution using BFS
+         
+"""
+
+
+
+In this problem, we use BFS to solve the N^2 - 1 puzzle.
+
+This is a challenging problem in many ways : 
+   
+   1. Firstly, the search space grows exponentially and so does the amount of memory required to
+      keep track of the visited states. It is obvious that leaving the visited states untracked 
+      would lead to an enormous time complexity.
+      
+      To deal with this problem, we do not begin with a fully random puzzle, instead
+      we make sure that the number of actual steps to reach the goal is not beyond a certain theshold.
+   
+   2. Secondly since it is tedious to manually look at the boards during BFS, we hash each board
+      by concatenating the digits in row-major order in form of a string such that 'a' is 1,
+      'b' is 2.. and so on.
+      The board
+      
+      1 2
+      3 4
+      
+      is thus represented as "abcd".It is easy to see that such a string would give a unique hashcode
+      for each board-state as long as the dimension <= 5. This is suitable for our problem. 
+      
+   3. Now we run a regular BFS and return the shortest path when we reach the goal for the first time.
