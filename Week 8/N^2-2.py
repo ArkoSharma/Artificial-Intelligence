@@ -29,13 +29,11 @@ from scipy.spatial import distance
 INF = 1000000000
 class N2Puzzle:
       """ 
-      Initialise the environment with a state which 8 random steps away from the goal destination.
-      Run BFS to check whether the search halts.
+      Environment implementing N^2 - Puzzle with two blank spaces.
       
       """
       
       def get_random_2D_direction(self):
-          #generate and return randomly permuted numbers from 1 to n-sq
           return np.random.randint(0,4); 
        
 
@@ -46,18 +44,18 @@ class N2Puzzle:
 
       def __init__(self,n):
           # populates the board with randomly permuted numbers less than n-squared.
-          # the number n-squared denotes the empty square whose location is tracked in the environment.
+          # the numbers n-squared and n^2 - 1 denote the empty square whose location is tracked in the environment.
 
           self.n = n
           self.n = int(raw_input())
-      self.board = np.array([x for x in range(self.n * self.n)]).reshape(self.n,self.n)
-      k = 1
-      for i in range(self.n):
+          self.board = np.array([x for x in range(self.n * self.n)]).reshape(self.n,self.n)
+          k = 1
+          for i in range(self.n):
           for j in range(self.n):
               self.board[i][j] = int(raw_input())
               k += 1
              
-      for i in range (self.n):
+          for i in range (self.n):
               for j in range(self.n):
                   if( self.board[i][j] == self.n*self.n ) :
                       self.empty_i = i
@@ -84,7 +82,8 @@ class N2Puzzle:
  
 
       def move_empty_squares(self,num_square,move_string):
-      if(move_string == "up" and num_square == self.n*self.n):
+          #function to move the blank cells in the designated direction.
+          if(move_string == "up" and num_square == self.n*self.n):
               if(self.empty_i == 0):
                    return
               else :
@@ -149,14 +148,15 @@ class N2Puzzle:
 
           if(move_string == "right" and num_square == self.n*self.n -1):
               if(self.empty2_j == self.n-1):
-                   return
+                  return
               else :
-                   temp = self.board[self.empty2_i][self.empty2_j + 1]
-                   self.board[self.empty2_i ][self.empty2_j + 1] = self.n * self.n -1
-                   self.board[self.empty2_i][self.empty2_j] = temp
-                   self.empty2_j += 1
+                  temp = self.board[self.empty2_i][self.empty2_j + 1]
+                  self.board[self.empty2_i ][self.empty2_j + 1] = self.n * self.n -1
+                  self.board[self.empty2_i][self.empty2_j] = temp
+                  self.empty2_j += 1
+          
           #update the values of the locations of the two blanks.
-      for i in range (self.n):
+          for i in range (self.n):
               for j in range(self.n):
                   if( self.board[i][j] == self.n*self.n ) :
                       self.empty_i = i
@@ -168,20 +168,20 @@ class N2Puzzle:
 
 
       def gen_xstep_board(self,x_steps):
-      #generates a board that is at most "x_steps" moves away from the destination
+          #generates a board that is at most "x_steps" moves away from the destination
           direction = ["up", "down", "left", "right"]
           for i in range(x_steps):
               d = np.random.randint(4)
-              self.move_empty_square(direction[d])
-      print("{}".format(self.board)) 
+              self.move_empty_squares(0,direction[d])
+          print("{}".format(self.board)) 
 
 
       def show_parity(self):
-          #function to calculate and show the parity as defined in the question.
-      #bottom right is in location(n-1,n-1)
+          #function to calculate and show the parity as defined for n^2 - puzzle.
+          #bottom right is in location(n-1,n-1)
           d_s = (self.n-1-self.empty_i) + (self.n - 1 - self.empty_j)
           counter = 0
-      for i in range(0,self.n):
+          for i in range(0,self.n):
               for j in range(0,self.n):
                   for k in range(0,self.n):
                       for l in range(0,self.n):
@@ -192,17 +192,13 @@ class N2Puzzle:
                   
      
           return ((d_s + counter)%2)
-          #print("Empty location = ({},{})".format(self.empty_i,self.empty_j))
-          #print("{}".format(self.board)) 
 
       def Manhattan_sum(self):
-          #function to calculate and show the parity as defined in the question.
-      #bottom right is in location(n-1,n-1)
-          d_s1 = (self.n-1-self.empty_i) + (self.n - 1 - self.empty_j)
-          d_s2 = (self.n-1-self.empty2_i) + (self.n - 2 - self.empty2_j)
+          #function to calculate and return the Manhattan distance of the board.
+          #bottom right is in location(n-1,n-1)
           
-          count = 0
-      for i in range(0,self.n):
+          dist = 0
+          for i in range(0,self.n):
               for j in range(0,self.n):
                   if(self.board[i][j] != self.n*self.n and self.board[i][j] != self.n*self.n - 1):
                       r = (self.board[i][j] - 1) // self.n 
@@ -210,13 +206,16 @@ class N2Puzzle:
                   else:
                       r = self.n - 1
                       c = self.n - 2                      
-                  count += (abs(r-i) + abs(c-j))*2
+                  dist += (abs(r-i) + abs(c-j))*2
+                  #experiment with other heuristics :
                   #count += distance.euclidean((i,j),(r,c))*2
-          return (count)
+          return (dist)
         
       
       def ensure_solvable(self):
-          #calculates parity and if parity is odd, then it flips the numbers at the two blank spaces
+          #Helper function to convert n^2 - 1 - puzzle to an instance of n^2-puzzle.
+          #Can be used to compare complexities of different approaches.
+          #Calculates parity and if parity is odd, then it flips the numbers at the two blank spaces
           if(self.show_parity() % 2 == 1):
               print "Ensuring Solvability by swapping blanks"
               for i in range(self.n):
@@ -233,7 +232,7 @@ class N2Puzzle:
               
 
       def get_hash(self):
-          #function to hash the board; ie create a string that uniquely determines the state of the board
+          #function to hash the board; ie create a string that uniquely determines the state of the board.
           str = ""
           for i in range(self.n):
               for j in range(self.n):
@@ -242,7 +241,7 @@ class N2Puzzle:
                  
 """ 
 Solver class.
-Currently only one 'method' of solving : BFS.
+Currently one 'method' of solving : A-star.
 """
 class N2Solver :
 
@@ -250,44 +249,6 @@ class N2Solver :
           self.path = []
           
 
-      def BFS(self,puzzle):
-          
-          
-          #function to solve the given N^2 - 1 puzzle using BFS 
-          directions = ["up", "right", "left", "down"]
-          #npuz = InhN2Puzzle(puz)
-          #define visited list,action-dict,parent-list and a Queue for BFS 
-          vis = []
-          action = {}
-          Q = Queue.Queue()
-          parent = {}          
-          #Insert start state into the queue.
-          #Set the parent of the start state to itself.
-          Q.put(puzzle)
-          parent[puzzle.get_hash()] = puzzle.get_hash()
-          while Q:
-          
-              curr = Q.get()
-              if  curr.is_solved():
-                  #Upon reaching the goal, reconstruct the path and return it.
-                  current = curr.get_hash()
-                  while(parent[current] != current):
-                      self.path.append(action[current])
-                      current = parent[current]
-                  self.path = self.path[::-1]
-                  return self.path
-
-              for Dir in directions:
-                  #create a copy of the original puzzle, apply movement, and insert into Queue
-                  childPuzzle = copy.deepcopy(curr)
-                  childPuzzle.move_empty_square(Dir)
-                  if  childPuzzle.get_hash() in vis:
-                      continue
-                  else:
-                      vis.append(childPuzzle.get_hash())
-                      parent[childPuzzle.get_hash()] = curr.get_hash()
-                      action[childPuzzle.get_hash()] = Dir
-                      Q.put(childPuzzle)
 
       """ 
       Runs A-star search algorithm with 4 movements where heuristic value is sum of double the Manhattan distances 
@@ -296,9 +257,6 @@ class N2Solver :
  
 
 
-          # first check if input puzzle is solvable by checking parity,
-          # if not then swap the two blanks to ensure it is.
-          #puzzle.ensure_solvable()
           directions = ["left", "right", "up", "down"]
           explored_list = []
           Q = Queue.PriorityQueue()
@@ -310,8 +268,6 @@ class N2Solver :
           """
           distances[puzzle.get_hash()] = 0
           Q.put((0+puzzle.Manhattan_sum(),puzzle,[]))
-          #parent[start[0]][start[1]] = start
-          #g[start[0]][start[1]] = 0
           
           while(not (Q.empty())):
 
@@ -324,20 +280,22 @@ class N2Solver :
                   print s.board
                   #return the path
                   return pop[2]
-          # Expand if current cell has not already been explored
-              # This check is necessary because multiple instances of this cell could have been pushed when it was not explored
+                
+              # Expand if current node has not already been explored
+              # This check is necessary because multiple instances of this node could have been pushed when it was not explored
               if  (s.get_hash() not in explored_list):
                   for i in range(4):
                     for j in range(2):
                          #create copies to push into the queue
                          childPuzzle = copy.deepcopy(s)
                          
+                         #Two values of j denote the two empty cells of the board.
                          if(j == 1):
                              childPuzzle.move_empty_squares(childPuzzle.n*childPuzzle.n,directions[i])
                          else :
                              childPuzzle.move_empty_squares(childPuzzle.n*childPuzzle.n - 1,directions[i])
+                         
                          childhash = childPuzzle.get_hash()
-
                          if(childPuzzle.get_hash() not in distances.keys()):
                              distances[childPuzzle.get_hash()] = 1000000000 
                          
@@ -352,7 +310,7 @@ class N2Solver :
                                  # update the g-value (real distance)
                                  # push the child with g + h - value
                                  distances[childPuzzle.get_hash()] = g_child
-                              if(j == 1) :
+                                 if(j == 1) :
                                      if(childPuzzle.is_solved()): 
                                          print childPuzzle.board
                                          return pop[2] + ["1-" + directions[i]]
@@ -363,7 +321,7 @@ class N2Solver :
                                          print childPuzzle.board
                                          return pop[2] + ["2-" + directions[i]]
                                      else : 
-                                          Q.put((g_child + h_child,childPuzzle,pop[2] + ["2-" + directions[i]]))          
+                                         Q.put((g_child + h_child,childPuzzle,pop[2] + ["2-" + directions[i]]))          
                                  
                   #after expanding all the children , mark the node as explored
                   explored_list.append(s.get_hash())
