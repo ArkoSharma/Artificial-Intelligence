@@ -5,9 +5,8 @@ Program depicting Value iteration and Policy iteration in a grid world environme
 Here the reward is a function of the current state only ie a constant reward is assumed to
 be obtained upon reaching a state.
 
+ToDo :
 
-issues :
-       probabilities of illegal moves to be el.
        check value iteration and do viBottUP
        do policy iteration
        blocks
@@ -28,9 +27,12 @@ class MDP_grid():
     This is a grid environment for a MDP problem.
     The state is defined by the location of the agent in the grid.
     For each state, 4 actions are allowed - movement in the 4 directions.
-    Also for each state is associated a 4x4 matrix A ; where Aij is the probability
-    of moving in direction "j" upon having selected direction "i".This depicts the randomness
-    of a real - world scenario.
+    
+    There is a transition-probability matrix "T" which gives a list of states
+    reachable on a particular action at a particular state , alongwith the probability of
+    of this transition.        
+
+    This depicts the randomness of a real - world scenario.
     """
 
     
@@ -53,9 +55,23 @@ class MDP_grid():
         self.generate_random_TransitionProbabilityMatrix(self.states,self.actions)
         self.generate_random_RewardMatrix(self.states,self.actions)
         
+
+    def inside_board(self,state):
+        r,c = state.r,state.c
+        if(r >= 0 and r < self.dimension and c >=0 and c < self.dimension):
+            return True
+        else: 
+            return False
+
+    def get_state(self,some_state):
+        #Function to return that state of the MDP which has the given values of the state variables
+        for s in self.states:
+            if (s.r == some_state.r and s.c == some_state.c):
+                return s
+        
     def generate_random_RewardMatrix(self,states,actions):
         #Function used to generate R
-        #Here, R is only a function of state ie each state has a fixed incoming reward.
+        #Here, R is only a function of state ie each state has a fixed reward.
         
         for s in states:
             self.R[s] = np.random.randint(-10,11)
@@ -68,19 +84,6 @@ class MDP_grid():
                 print("")
                 k = 0
 
-    def inside_board(self,state):
-        r,c = state.r,state.c
-        if(r >= 0 and r < self.dimension and c >=0 and c < self.dimension):
-            return True
-        else: 
-            return False
-
-    def get_state(self,some_state):
-        #Function to return that state of the MDP which has the given state values of the state variables
-        for s in self.states:
-            if (s.r == some_state.r and s.c == some_state.c):
-                return s
-        
     def generate_random_TransitionProbabilityMatrix(self,states,actions):
         # Function used to generate T.
         # Assumed that the agent moves only to the 4 adjoining cells with non zero probability.
@@ -177,4 +180,3 @@ for i in range (4):
     for j in range(4):
         print("{} ".format(grid.actions[policy[grid.get_state(state(i,j))]]),end = "")
     print("")   
-
