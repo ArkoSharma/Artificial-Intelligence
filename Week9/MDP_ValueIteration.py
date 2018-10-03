@@ -5,12 +5,12 @@ Program depicting Value iteration and Policy iteration in a grid world environme
 Here the reward is a function of the current state only ie a constant reward is assumed to
 be obtained upon reaching a state.
 ToDo :
-       check value iteration and do viBottUP
        do policy iteration
        blocks
 """
 from __future__ import print_function
 import numpy as np
+import random
 
 class state:
       
@@ -71,13 +71,13 @@ class MDP_grid():
         #Here, R is only a function of state ie each state has a fixed reward.
         
         for s in states:
-            self.R[s] = np.random.randint(-10, 11)
+            self.R[s] = np.random.randint(-2, 0)
         print ("Rewards:")
         k = 0
         for s in states:
             print (self.R[s], end = ' ')
             k += 1
-            if (k + 1 % 4 == 0):
+            if ((k) % 4 == 0):
                 print("")
                 k = 0
 
@@ -105,7 +105,7 @@ class MDP_grid():
                         if (self.inside_board(neighbour) and neighbour != succ_neigh):
                             valid_neighbours.append(self.get_state(neighbour))
                
-                fail          = (1 - success)/len(valid_neighbours)
+                fail           = (1 - success)/len(valid_neighbours)
                 self.T[(a, s)] = []
                 for val_neigh in valid_neighbours:
                     self.T[(a, s)].append((val_neigh, fail))
@@ -129,7 +129,7 @@ class SolveMDP:
         Starting with random V and iterating till convergence.
         """
 
-        #define random Values	
+        #define random Values    
         V = {}
         T, R, gamma = mdp_grid.T, mdp_grid.R, mdp_grid.gamma
 
@@ -171,57 +171,114 @@ class SolveMDP:
         return policy
 
 
-    def DP_helper(self, mdp_grid, state, num_steps, taken_steps):
+    def DP_helper(self, mdp_grid, grid_state, steps_remaining):
         """
-        Returns optimal value of a state.
+        Returns optimal value of a dp - state defined by the cell the agent is in and the no. of remaining steps to take.
         """
  
-        if  (taken_steps > num_steps):
-            return -100000000000000
+        cell = (grid_state.r, grid_state.c)
+        #Base case
+        if  (steps_remaining == 0):
+            self.dp[(cell, steps_remaining)] = -100000000000000
+            return self.dp[(cell, steps_remaining)]
  
-        if  (self.dp[state] != -100000000000000):
-            return self.dp[state]
+        if  (self.dp[(cell, steps_remaining)] != -100000000000000):
+            return self.dp[(cell, steps_remaining)]
      
         else:
             temp = -100000000000000
             for a in mdp_grid.actions:
                 disc_exp_reward = 0
-                for (next, prob) in mdp_grid.T[(a, state)]:
-                    disc_exp_reward += prob * (mdp_grid.R[next] +  mdp_grid.gamma * self.DP_helper(mdp_grid, next, num_steps, taken_steps + 1))
+                for (next, prob) in mdp_grid.T[(a, grid_state)]:
+                    disc_exp_reward += prob * (mdp_grid.R[next] +  mdp_grid.gamma * self.DP_helper(mdp_grid, next, steps_remaining - 1))
                 temp = np.max([temp, disc_exp_reward])
-            self.dp[state] = temp
-            return self.dp[state]
+            self.dp[(cell, steps_remaining)] = temp
+            return self.dp[(cell, steps_remaining)]
 
                 
-    def DynamicProgramming(self, mdp_grid, num_steps):
+    def DP_FiniteHorizon(self, mdp_grid, num_steps):
         """
-        Solving an MDP by DP.
-        We have to optimise the cumulative sum of discounted expected rewards over an infinite horizon for every choice of starting state.
+        Solving the MPD grid world for a finite horizon by DP.
+        Function to optimise the cumulative sum of discounted expected rewards over a given finite horizon for every choice of starting state.
         """
         #here dp stores the optimal value of the states.
         self.dp = {}
-        
+        V       = {}
+ 
         for s in mdp_grid.states:
-            self.dp[s] = -100000000000000
+            for steps in range(num_steps + 1):
+                self.dp[((s.r, s.c), steps)] = -100000000000000
 
         for s in mdp_grid.states:
-            self.dp[s] = self.DP_helper(mdp_grid, s, num_steps, 0)
+            V[s] = self.DP_helper(mdp_grid, s, num_steps)
 
-        return self.dp
+        return V
                 
+    def policy_iteration(self, mdp_grid):
+        """
+        Solve an MDP by policy iteration.
+        """
 
-           
+        V      = {}       
+        policy = {}
+
+        #choose a random policy
+        for s in mdp_grid.states:
+            V[s]      = 0
+            policy[s] = mdp_grid.actions[ np.random.randint(0,4) ]
+
+        while True:
+            V = self.policy_evaluation(policy, V, mdp_grid)
+            unchanged = True
+            recovered_policy = recover_policy(mdp_grid, V)
+            for s in mdp_grid.states:
+                if recovered_policy[s] != policy[s]:
+                    policy[s] = recovered_policy[s]
+                    unchanged = False
+            if unchanged:
+                return policy
+
+
+    def policy_evaluation(self, policy, V, mdp_grid, k=20):
+    
+        R, T, gamma = mdp_grid.R, mdp_grid.T, mdp_grid.gamma
+        for i in range(k):
+            for s in mdp_grid.states:
+                for (next, prob) in T[(s, policy[s])] :
+                    V[s] += gamma * prob * V[next] 
+                V[s] += R[s]
+        return V
+
+
 grid     = MDP_grid(4, 0.9)
-solver   = SolveMDP()
-policy   = (solver.value_iteration(grid, 0.00001))
-optimal_value = solver.DynamicProgramming(grid, 100)
+solver = SolveMDP()
 
+policy  = (solver.value_iteration(grid, 0.00001))
+#policy2 = (solver.policy_iteration(grid))
+steps = 800
+value_matrix = solver.DP_FiniteHorizon(grid, steps)
+
+
+print ("Above is the optimal value-matrix obtained from value iteration (Infinite Horizon) ^^\n")
+
+print ("\nOptimal Value Matrix for finite horizon ( number of steps = {} )  vv\n".format(steps))
+for i in range (4):
+    for j in range(4):
+        print("{} ".format(value_matrix[ grid.get_state(state(i, j)) ] ), end = "")
+    print("") 
+print("\n")
+
+
+print ("Policy from value iteration ::\n")
 for i in range (4):
     for j in range(4):
         print("{} ".format(grid.actions[policy[grid.get_state(state(i, j))]]), end = "")
     print("") 
 
+
+print ("\nPolicy from policy iteration ::\n")
 for i in range (4):
     for j in range(4):
-        print("{} ".format(optimal_value[grid.get_state(state(i, j))]), end = "")
+       pass
+       #print("{} ".format(grid.actions[policy2[grid.get_state(state(i, j))]]), end = "")
     print("") 
