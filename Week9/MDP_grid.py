@@ -1,16 +1,24 @@
-
 """
 Arko Sharma
-01.10.2018
+04.10.2018
 
 Program depicting Value iteration and Policy iteration in a grid world environment.
 Here the reward is a function of the current state and action only ie a constant reward is 
 obtained upon taking an action from a state; which can be assumed to be the expected
 reward over all states reachable from that state, on that action.
 
+There are two solver methods  :  policy iteration and value iteration which start with 
+                                 random pseudovalue initial answers and iteratively 
+                                 converge towards the actual answers depicting an 
+                                 infinite horizon with discounted rewards.
+
+There is also a general method : Using simple dynamic programming, starting with a given 
+                                 start state and given number of steps (FINITE horizon), we
+                                 use the optimality principle similar to value iteration to get the 
+                                 best possible value out of the grid.
+
 ToDo :
-       do policy iteration
-       blocks
+       blocked cells
 """
 from __future__ import print_function
 import numpy as np
@@ -34,6 +42,12 @@ class MDP_grid():
     reachable on a particular action at a particular state , alongwith the probability of
     of this transition.        
     This depicts the randomness of a real - world scenario.
+
+    There is a reward matrix "R" which stores the reward obtained upon taking an action at
+    a given state. This value represents the expected reward over all states reachable from 
+    that state on that action.
+  
+    There is also an Actions matrix representing the set of allowed actions. 
     """
 
     
@@ -83,7 +97,7 @@ class MDP_grid():
         
         for s in states:
             for a in actions:
-                self.R[(s,a)] = np.random.randint(-2 , 10)
+                self.R[(s,a)] = np.random.randint(0 , 10)
 
         print ("Rewards:")
         for s in states:
@@ -138,7 +152,7 @@ class SolveMDP:
   
     def value_iteration(self, mdp_grid, epsilon):
         """
-        Solving an MDP to get optimal value using value - iteration.
+        Solving a MDP to get optimal value using value - iteration.
         Starting with random V and iterating till convergence.
         """
 
@@ -182,7 +196,7 @@ class SolveMDP:
         """
         policy = {}
         for s in mdp_grid.states:
-            policy[s] = np.argmax ( [   mdp_grid.gamma * sum ( [ prob * V[next] for (next, prob) in mdp_grid.T[(a, s)] ] ) for a in mdp_grid.actions  ] )   
+            policy[s] = np.argmax ( [   mdp_grid.R[(s,a)] + mdp_grid.gamma * sum ( [ prob * V[next] for (next, prob) in mdp_grid.T[(a, s)] ] ) for a in mdp_grid.actions  ] )   
         return policy
 
 
@@ -221,7 +235,7 @@ class SolveMDP:
         Solving the MPD grid world for a finite horizon by DP.
         Function to optimise the cumulative sum of discounted expected rewards over a given finite horizon for every choice of starting state.
         """
-        #here dp stores the optimal value of the states.
+        #here dp will store the optimal value of the state given the number of remaining steps.
         self.dp = {}
         V       = {}
  
@@ -232,11 +246,11 @@ class SolveMDP:
         for s in mdp_grid.states:
             V[s] = self.DP_helper(mdp_grid, s, num_steps)
 
-        return V
+        return (V, self.recover_policy(mdp_grid, V))
                 
     def policy_iteration(self, mdp_grid):
         """
-        Solve an MDP by policy iteration.
+        Solving a MDP by policy iteration.
         """
 
         V      = {}       
@@ -256,7 +270,7 @@ class SolveMDP:
                     policy[s] = recovered_policy[s]
                     unchanged = False
             if unchanged:
-             
+		V = self.policy_evaluation(policy, V, mdp_grid)           
                 return (V, policy)
 
 
@@ -265,11 +279,10 @@ class SolveMDP:
     
         V_eval = {}
         R, T, gamma = mdp_grid.R, mdp_grid.T, mdp_grid.gamma
-        for i in range(k):
-            for s in mdp_grid.states:
-                V_eval[s] = R[(s, mdp_grid.actions[policy[s]])] 
-                for (next, prob) in T[(mdp_grid.actions[policy[s]], s)] :
-                    V_eval[s] += gamma * prob * V[next] 
+        for s in mdp_grid.states:
+            V_eval[s] = R[(s, mdp_grid.actions[policy[s]])] 
+            for (next, prob) in T[(mdp_grid.actions[policy[s]], s)] :
+                V_eval[s] += gamma * prob * V[next] 
                 
         return V_eval
 
@@ -286,7 +299,7 @@ solver    = SolveMDP()
 
 valueVI, policyVI = (solver.value_iteration(grid, 0.00001))
 steps             = 800
-value_matrix      = solver.DP_FiniteHorizon(grid, steps)
+valueDP, policyDP      = solver.DP_FiniteHorizon(grid, steps)
 
 
 print ("\nOptimal Value Matrix from ValueIteration ::")
@@ -302,7 +315,7 @@ print ("\nOptimal Value Matrix for finite horizon ( number of steps = {} )  vv\n
 print ("-------------------------------------------------------------------------\n")
 for i in range (dimension):
     for j in range(dimension):
-        print("{} ".format(value_matrix[ grid.get_state(state(i, j)) ] ), end = "")
+        print("{} ".format(valueDP[ grid.get_state(state(i, j)) ] ), end = "")
     print("") 
 print ("-------------------------------------------------------------------------\n")
 
@@ -323,6 +336,15 @@ print ("------------------------------------------------------------------------
 for i in range (dimension):
     for j in range(dimension):
         print("{} ".format(grid.actions[policyVI[grid.get_state(state(i, j))]]), end = "")
+    print("") 
+print ("-------------------------------------------------------------------------\n")
+
+
+print ("Policy from DP with {} steps ::\n".format(steps))
+print ("-------------------------------------------------------------------------\n")
+for i in range (dimension):
+    for j in range(dimension):
+        print("{} ".format(grid.actions[policyDP[grid.get_state(state(i, j))]]), end = "")
     print("") 
 print ("-------------------------------------------------------------------------\n")
 
