@@ -1,27 +1,26 @@
 """
 Arko Sharma
-04.10.2018
+05.10.2018
 
-Program depicting Value iteration and Policy iteration in a grid world environment.
+Program depicting Value iteration and Policy iteration in a grid world MDP environment.
 Here the reward is a function of the current state and action only ie a constant reward is 
 obtained upon taking an action from a state; which can be assumed to be the expected
 reward over all states reachable from that state, on that action.
 
-There are two solver methods  :  policy iteration and value iteration which start with 
+There are two solver methods  :  Policy - iteration and Value - iteration which start with 
                                  random pseudovalue initial answers and iteratively 
                                  converge towards the actual answers depicting an 
                                  infinite horizon with discounted rewards.
 
 There is also a general method : Using simple dynamic programming, starting with a given 
                                  start state and given number of steps (FINITE horizon), we
-                                 use the optimality principle similar to value iteration to get the 
-                                 best possible value out of the grid.
+                                 use the optimality principle  to get the best possible value out of the grid.
 
-ToDo :
-       blocked cells
 """
+
 from __future__ import print_function
 import numpy as np
+import copy
 import random
 
 class state:
@@ -97,7 +96,7 @@ class MDP_grid():
         
         for s in states:
             for a in actions:
-                self.R[(s,a)] = np.random.randint(0 , 10)
+                self.R[(s,a)] = np.random.randint(-10 , 11)
 
         print ("Rewards:")
         for s in states:
@@ -163,14 +162,19 @@ class SolveMDP:
         for s in mdp_grid.states:
             V[s] = np.random.randint(-10, 11)
        
+        
+        t = 0
         while(True):
-            V_copy = V.copy()
-            delta = 0
+            V_copy = {}
+            for s in mdp_grid.states:
+                V_copy[s]  = V[s] 
+            delta   = 0
+            gamma_t = gamma ** t 
             for s in mdp_grid.states:
                 Q = []
                 for a in mdp_grid.actions:
                     #first add the expected reward on taking this action (present)
-                    acc = R[(s,a)]
+                    acc = R[(s,a)] 
                     for (next_state, prob) in T[(a, s)]:
                         #then add the expected discounted reward of the future
                         acc += prob*( gamma * V_copy[next_state])
@@ -188,6 +192,8 @@ class SolveMDP:
             delta = max(delta, np.abs(V[s] - V_copy[s]))
             if  delta <= epsilon*(1 - gamma)/gamma:
                 return (V, self.recover_policy(mdp_grid, V))
+
+            t     += 1
  
 
     def recover_policy(self, mdp_grid, V):
@@ -247,7 +253,9 @@ class SolveMDP:
             V[s] = self.DP_helper(mdp_grid, s, num_steps)
 
         return (V, self.recover_policy(mdp_grid, V))
-                
+               
+	
+	
     def policy_iteration(self, mdp_grid):
         """
         Solving a MDP by policy iteration.
@@ -275,16 +283,31 @@ class SolveMDP:
 
 
 
-    def policy_evaluation(self, policy, V, mdp_grid, k=20):
-    
-        V_eval = {}
+    def policy_evaluation(self, policy, V, mdp_grid):
+        """
+        Iterate till convergence :: similar to solving linear equations to get V.
+        """
+        V_copy = {}
         R, T, gamma = mdp_grid.R, mdp_grid.T, mdp_grid.gamma
-        for s in mdp_grid.states:
-            V_eval[s] = R[(s, mdp_grid.actions[policy[s]])] 
-            for (next, prob) in T[(mdp_grid.actions[policy[s]], s)] :
-                V_eval[s] += gamma * prob * V[next] 
+         
+        while True:
+            V_copy = {}
+            for s in mdp_grid.states:
+                V_copy[s]  = V[s] 
+            delta   = 0
+            for s in mdp_grid.states:
+                a = mdp_grid.actions[ policy[s] ]
+                acc = R[(s,a)] 
+                for (next_state, prob) in T[(a, s)]:
+                    acc += prob*( gamma * V_copy[next_state])
+                V[s] = acc
+
+            delta = max(delta, np.abs(V[s] - V_copy[s]))
+            if  delta <= 0.00001*(1 - gamma)/gamma:
+                return V
+
                 
-        return V_eval
+        return V
 
 
 
@@ -292,14 +315,14 @@ class SolveMDP:
 """
 Generating a grid and solving the MDP question.
 """
-dimension = 3
+dimension = 4
 gamma     = 0.9
 grid      = MDP_grid(dimension, gamma)
 solver    = SolveMDP()
 
 valueVI, policyVI = (solver.value_iteration(grid, 0.00001))
 steps             = 800
-valueDP, policyDP      = solver.DP_FiniteHorizon(grid, steps)
+valueDP, policyDP = solver.DP_FiniteHorizon(grid, steps)
 
 
 print ("\nOptimal Value Matrix from ValueIteration ::")
