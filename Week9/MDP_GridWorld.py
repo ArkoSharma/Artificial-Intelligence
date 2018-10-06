@@ -7,15 +7,18 @@ Here the reward is a function of the current state and action only ie a constant
 obtained upon taking an action from a state; which can be assumed to be the expected
 reward over all states reachable from that state, on that action.
 
-There are two solver methods  :  Policy - iteration and Value - iteration which start with 
+There are two solver methods for solving in the infinite horizon setting
+                            
+                               : Policy - iteration and Value - iteration which start with 
                                  random pseudovalue initial answers and iteratively 
                                  converge towards the actual answers depicting an 
                                  infinite horizon with discounted rewards.
-
-There is also a general method : Using simple dynamic programming, starting with a given 
+                                 
+There is also a general method using DP , which solves the finite horizon case
+                               
+                               : Using simple dynamic programming, starting with a given 
                                  start state and given number of steps (FINITE horizon), we
                                  use the optimality principle  to get the best possible value out of the grid.
-
 """
 
 from __future__ import print_function
@@ -41,7 +44,6 @@ class MDP_grid():
     reachable on a particular action at a particular state , alongwith the probability of
     of this transition.        
     This depicts the randomness of a real - world scenario.
-
     There is a reward matrix "R" which stores the reward obtained upon taking an action at
     a given state. This value represents the expected reward over all states reachable from 
     that state on that action.
@@ -96,12 +98,8 @@ class MDP_grid():
         
         for s in states:
             for a in actions:
-                self.R[(s,a)] = np.random.randint(-10 , 11)
+                self.R[(s,a)] = np.random.randint(-5 , 20)
 
-        print ("Rewards:")
-        for s in states:
-            for a in actions:
-                print ("Reward of state {} and action {} is {} ".format((s.r, s.c), a, self.R[(s,a)]) )
 
 
     def generate_random_TransitionProbabilityMatrix(self, states, actions):
@@ -258,7 +256,7 @@ class SolveMDP:
 	
     def policy_iteration(self, mdp_grid):
         """
-        Solving a MDP by policy iteration.
+        Solving the MDP question by policy iteration.
         """
 
         V      = {}       
@@ -294,15 +292,15 @@ class SolveMDP:
             V_copy = {}
             for s in mdp_grid.states:
                 V_copy[s]  = V[s] 
-            delta   = 0
+            delta    = 0
             for s in mdp_grid.states:
-                a = mdp_grid.actions[ policy[s] ]
-                acc = R[(s,a)] 
+                a    = mdp_grid.actions[ policy[s] ]
+                acc  = R[(s,a)] 
                 for (next_state, prob) in T[(a, s)]:
                     acc += prob*( gamma * V_copy[next_state])
                 V[s] = acc
 
-            delta = max(delta, np.abs(V[s] - V_copy[s]))
+            delta    = max(delta, np.abs(V[s] - V_copy[s]))
             if  delta <= 0.00001*(1 - gamma)/gamma:
                 return V
 
@@ -324,6 +322,13 @@ valueVI, policyVI = (solver.value_iteration(grid, 0.00001))
 steps             = 800
 valueDP, policyDP = solver.DP_FiniteHorizon(grid, steps)
 
+
+print("Above are the progressive value - matrices of Value Iteration.\n")
+
+print ("Rewards:")
+for s in grid.states:
+    for a in grid.actions:
+        print ("Reward of state {} and action {} is {} ".format((s.r, s.c), a, grid.R[(s,a)]) )
 
 print ("\nOptimal Value Matrix from ValueIteration ::")
 print ("-------------------------------------------------------------------------\n")
