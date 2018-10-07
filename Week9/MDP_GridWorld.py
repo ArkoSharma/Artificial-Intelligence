@@ -174,12 +174,11 @@ class SolveMDP:
                 V[s] = max(Q)
 
 
-             for i in range (mdp_grid.dimension):
-                 for j in range(mdp_grid.dimension):
-                 
-                     print ("{} ".format(V[mdp_grid.get_state(state(i, j))]), end = "")
-                 print("")
-             print("\n\n")
+            for i in range (mdp_grid.dimension):
+                for j in range(mdp_grid.dimension):
+                    print ("{} ".format(V[mdp_grid.get_state(state(i, j))]), end = "")
+                print("")
+            print("\n\n")
 
             delta = 0
             for s in mdp_grid.states:
@@ -391,7 +390,6 @@ for i in range(200):
     gamma     = 0.9
     grid      = MDP_grid(dimension, gamma)
     solver    = SolveMDP()
-
     valueVI, policyVI = (solver.value_iteration(grid, 0.000001))
     valuePI, policyPI = solver.policy_iteration(grid)
     for s in grid.states:
