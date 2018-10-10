@@ -1,14 +1,8 @@
 from __future__ import print_function
 import numpy as np
 
-dp = {}
-
-for ball in range(0, 301):
-    for player in range(0, 11): 
-        dp[(player,ball)] = (-1, -1)
-      
-
-
+dp        = {}
+best_shot = {}      
 
 
 #actions contain all types of shots that can be played
@@ -29,46 +23,47 @@ def get_probability(x, a):
     return (pw, pr)
 
 
-def solveDP(player, balls_left):
+def solveDP():
     """ 
     Returns the optimal action at the DP-state defined by the player's index and the no of remaining balls.
     """
 
     #Base cases
-    if( balls_left == 0 ):
-        return (0, -1)
-    if( player     == 11):
-        return (0, -1) 
+    for player in range(1, 11):
+        dp[(player, 0)]    = 0
+    for balls_rem in range(0, 301):
+        dp[(0, balls_rem)] = 0
 
-    if (dp[(player, balls_left)][0] != -1):
-        return dp[(player, balls_left)]  
 
-    else:
-        temp = -100
-        Q    = []
-        for a in range(len(shots)):
-            p_run, p_out = get_probability(player,a)
+    for player in range(1, 11):
+        for balls_rem in range(1, 301):
             
-            #assuming if the shot is unsuccesful then the player scores no runs.
-            Q.append( p_out * solveDP( player + 1, balls_left - 1)[0] + p_run * (shots[a] + solveDP(player, balls_left - 1)[0]))
-        
-        best_run                 = np.max(Q)
-        best_shot                = np.argmax(Q)
-        dp[(player, balls_left)] = (best_run, best_shot)
-        return dp[(player, balls_left)]
-
+            temp = -1
+            for si in range(len(shots)) :
+                prob_out, prob_score = get_probability(player, si)
+                print(prob_out)
+                out_runs = 0
+                if( player <= 9): 
+                    out_runs = dp[(player + 1, balls_rem - 1)] * prob_out
+                temp = max( out_runs + (dp[(player, balls_rem - 1)] + shots[si]) * prob_score, temp)  
 
 """
 Showing the results
 """
 
+# DP state       : current player and number of remaining balls .
+# Value          : Maximum expected runs at this state .
+# DP Transitions : iterate over all the actions and take the maximum of the expected runs . 
 
-solveDP(1,300)
+
+
+
+#Solve the problems in bottom - up fashion to see all combinations.
+solveDP()
+
 
 #np.savetxt("OptimalThings.txt", dp, delimiter = "\t", header = head, fmt = "%d")
 for balls in range(1,301):
     for player in range(1,11):
-        print("{} {} ".format(dp[(player, ball)]), end = "")
+        print("{} ".format(dp[(player, ball)]), end = "")
     print ("")
-
-
