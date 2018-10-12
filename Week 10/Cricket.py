@@ -18,8 +18,8 @@ pr_max = 0.8
 
 
 def get_probability(x, a):
-    pw = pw_min[a] + (pw_max[a] - pw_min[a]) * (( x - 1) / 9) 
-    pr = pr_min + (pr_max - pr_min) * (( x - 1) / 9) 
+    pw = pw_min[a] + (pw_max[a] - pw_min[a]) * (( x - 1) / 9.0 ) 
+    pr = pr_min + (pr_max - pr_min) * (( x - 1) / 9.0 ) 
     return (pw, pr)
 
 
@@ -28,24 +28,24 @@ def solveDP():
     Returns the optimal action at the DP-state defined by the player's index and the no of remaining balls.
     """
 
+
     #Base cases
     for player in range(1, 11):
         dp[(player, 0)]    = 0
     for balls_rem in range(0, 301):
         dp[(0, balls_rem)] = 0
 
-
-    for player in range(1, 11):
-        for balls_rem in range(1, 301):
-            
-            temp = -1
+    for balls_rem in range(1, 301):
+        for player in range(1, 11):
+            Q = []
             for si in range(len(shots)) :
                 prob_out, prob_score = get_probability(player, si)
-                print(prob_out)
                 out_runs = 0
                 if( player <= 9): 
-                    out_runs = dp[(player + 1, balls_rem - 1)] * prob_out
-                temp = max( out_runs + (dp[(player, balls_rem - 1)] + shots[si]) * prob_score, temp)  
+                    out_runs = dp[(player + 1, balls_rem - 1)]
+                Q.append( prob_out * out_runs + (1 - prob_out) * (dp[(player, balls_rem - 1)] + shots[si] * prob_score)  ) 
+            dp[(player, balls_rem)] = np.max( Q )
+            best_shot[(player, balls_rem)] = shots[np.argmax( Q )]
 
 """
 Showing the results
@@ -65,5 +65,10 @@ solveDP()
 #np.savetxt("OptimalThings.txt", dp, delimiter = "\t", header = head, fmt = "%d")
 for balls in range(1,301):
     for player in range(1,11):
-        print("{} ".format(dp[(player, ball)]), end = "")
+        print("{} ".format(dp[(player, balls)]), end = "")
+    print ("")
+    
+for balls in range(1,301):
+    for player in range(1,11):
+        print("{} ".format(best_shot[(player, balls)]), end = "")
     print ("")
