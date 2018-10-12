@@ -19,7 +19,7 @@ pr_max = 0.8
 
 def get_probability(x, a):
     pw = pw_min[a] + (pw_max[a] - pw_min[a]) * (( x - 1) / 9.0 ) 
-    pr = pr_min + (pr_max - pr_min) * (( x - 1) / 9.0 ) 
+    pr = pr_max + (pr_min - pr_max) * (( x - 1) / 9.0 ) 
     return (pw, pr)
 
 
@@ -61,14 +61,16 @@ Showing the results
 #Solve the problems in bottom - up fashion to see all combinations.
 solveDP()
 
+best_value  = np.zeros((300, 10))
+best_action = np.zeros((300, 10))
+for i in range(300):
+    for j in range(10):
+        best_value[i][j]  = dp[(j + 1, i + 1)]
+        best_action[i][j] = best_shot[(j + 1, i + 1)]
 
-#np.savetxt("OptimalThings.txt", dp, delimiter = "\t", header = head, fmt = "%d")
-for balls in range(1,301):
-    for player in range(1,11):
-        print("{} ".format(dp[(player, balls)]), end = "")
-    print ("")
-    
-for balls in range(1,301):
-    for player in range(1,11):
-        print("{} ".format(best_shot[(player, balls)]), end = "")
-    print ("")
+
+headv = "In following matrix V, Vij is the best expected value at state ( i = balls remaining, j = player index )\n"
+np.savetxt("OptimalValue.txt", best_value, delimiter = "    ", header = headv, fmt = "%f")
+
+heada = "In following matrix A, Aij is the optimal action at state ( i = balls remaining, j = player index )\n"
+np.savetxt("OptimalActions.txt", best_action, delimiter = "    ", header = heada, fmt = "%d")
