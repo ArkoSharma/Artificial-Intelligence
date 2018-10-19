@@ -1,15 +1,11 @@
 """
 Description
 An underpowered car must climb a one-dimensional hill to reach a target.
-
-
 The target is on top of a hill on the right-hand side of the car (0.6) . If the car reaches it or goes beyond 0.56, the episode terminates.
 On the left-hand side, there is another hill. Climbing this hill can be used to gain potential energy and accelerate towards the target.
 On top of this second hill, the car cannot go further than a position equal to -1.2 , as  if there was a wall. Hitting this limit does not generate 
 a penalty (it might in a more challenging version).
-
 Update equations :
-
 v(t + 1) = v(t) + acc(t) * 0.001  + (cos( 3 * pos(t)) (-0.0025)
 pos(t)   = pos(t) * vel(t)
 acc      = (-1, 0 ,1)
@@ -17,10 +13,7 @@ gamma    = 0.99
 v        = (-0.07, 0.07)
 reward   = 1 if goal state is reached
          = 0 otherwise
-
 The agenda is to find an optimum policy , ie given a position and a velocity, find the value of acceleration.
-
-
 There are two solver methods for solving in the infinite horizon setting
                             
                                : Policy - iteration and Value - iteration which start with 
@@ -49,42 +42,44 @@ class state:
         self.v = v
           
           
-class MDP_grid():
+class MDP_MountainCar():
     
     """
-    This is a grid environment for a MDP problem.
+    This is the mountain-car environment for a MDP problem.
     The state is defined by the position and velocity of the car.
     For each state, 3 actions are allowed corresponding to 3 possible values of acceleration.
     
     There is a transition-probability matrix "T" which gives a list of states
     reachable on a particular action at a particular state , alongwith the probability of
     of this transition.        
-
   
     There are Reward and Actions matrices representing the MDP setting. 
     """
 
     
     def __init__(self):
-        self.positions  = range(-120, 61)
-        self.velocities = range(-70, 71)
+        self.positions  = range(-12, 6)
+        self.velocities = range(-7, 7)
         self.gamma = 0.99
         self.T = {}
         self.R = {}
+        self.actions  = ["d", "m", "a","s"]
         # d - decelerate
         # m - maintain_speed
         # a - accelerate
-        self.actions  = ["d", "m", "a"]
+        # s - stop
         self.dx_act = {}
         self.dx_act["d"]     = -1
-        self.dx_act["m"] =  0
+        self.dx_act["m"]     =  0
         self.dx_act["a"]     =  1
+        self.dx_act["s"]     =  0 #this value is irrelevant
+        
         self.states = []
         
         #discretizing the values -- position : -120 to 60
         #                        -- velocity : -70  to 70
-        for i in range (-120, 61):
-            for j in range (-70, 71):
+        for i in range (-12, 6):
+            for j in range (-7, 7):
                 self.states.append(state(i, j))
 
         self.generate_TransitionProbabilityMatrix(self.states, self.actions)
@@ -110,13 +105,25 @@ class MDP_grid():
         """
         
         for s in states:
+     
+     
             for a in actions:
                 #first put terminating condition 
-                
-                if(self.T[(a,s)][0][0].p > 56) : 
+                #once on top of the mountain, only maintain speed .
+                if (s.p > 5.6):
+                    if(a == "m"):
+                        self.R[(s,a)] =     
+                    
+                    
+                    self.R[(s,a)] = -1000000000000
+                    continue
+            
+                    
+                #if going from non-goal to goal-state, award 1                 
+                if(self.T[(a,s)][0][0].p > 5.6) : 
                     self.R[(s, a)] = 1
                 else:
-                    self.R[(s, a)] = 0
+                    self.R[(s, a)] = -1
 
 
 
@@ -128,28 +135,27 @@ class MDP_grid():
         
         v(t + 1) = v(t) + acc(t) * 0.001  + cos( 3 * pos(t)) (-0.0025)
         pos(t)   = pos(t) * vel(t)
-
         The values are rounded up and discretized.
-
         """
         
         k = 0
         for s in states:
             for a in actions:
+             
                 k += 1
                 print(k)
                 v_next = round( ((s.v/100.0) + self.dx_act[a] * 0.001 + math.cos(3.0 * s.p / 100.0) * (-0.0025 ) )* 100) 
                 
-                if (v_next < -70):
-                    v_next = -70
-                if (v_next > 70):
-                    v_next = 70
+                if (v_next < -7):
+                    v_next = -7
+                if (v_next > 7):
+                    v_next = 7
                 p_next = round(s.p * v_next / 100.0)
                 
-                if (p_next < -120):
-                    p_next = -120
-                if (p_next > 60):
-                    p_next = 60      
+                if (p_next < -12):
+                    p_next = -12
+                if (p_next > 6):
+                    p_next = 6      
        
                 v = int(v_next)
                 p = int(p_next)
@@ -330,7 +336,7 @@ class SolveMDP:
 """
 """
 
-grid      = MDP_grid()
+grid      = MDP_MountainCar()
 print("hi")
 solver    = SolveMDP()
 
@@ -380,5 +386,3 @@ print (stress)
  
           
           
-                                                     
-        
