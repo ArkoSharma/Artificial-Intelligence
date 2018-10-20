@@ -7,12 +7,12 @@ On top of this second hill, the car cannot go further than a position equal to -
 a penalty (it might in a more challenging version).
 Update equations :
 v(t + 1) = v(t) + acc(t) * 0.001  + (cos( 3 * pos(t)) (-0.0025)
-pos(t)   = pos(t) * vel(t)
+pos(t)   = pos(t) + vel(t)
 acc      = (-1, 0 ,1)
 gamma    = 0.99
 v        = (-0.07, 0.07)
-reward   = 1 if goal state is reached
-         = 0 otherwise
+reward   = 0 everywhere and 1 at the goal. 
+
 The agenda is to find an optimum policy , ie given a position and a velocity, find the value of acceleration.
 There are two solver methods for solving in the infinite horizon setting
                             
@@ -58,8 +58,8 @@ class MDP_MountainCar():
 
     
     def __init__(self):
-        self.positions  = range(-12, 6)
-        self.velocities = range(-7, 7)
+        self.positions  = range(-12, 7)
+        self.velocities = range(-7, 8)
         self.gamma = 0.99
         self.T = {}
         self.R = {}
@@ -78,8 +78,8 @@ class MDP_MountainCar():
         
         #discretizing the values -- position : -120 to 60
         #                        -- velocity : -70  to 70
-        for i in range (-12, 6):
-            for j in range (-7, 7):
+        for i in range (-12, 7):
+            for j in range (-7, 8):
                 self.states.append(state(i, j))
 
         self.generate_TransitionProbabilityMatrix(self.states, self.actions)
@@ -105,25 +105,21 @@ class MDP_MountainCar():
         """
         
         for s in states:
-     
-     
             for a in actions:
                 #first put terminating condition 
                 #once on top of the mountain, only maintain speed .
                 if (s.p > 5.6):
                     if(a == "m"):
-                        self.R[(s,a)] =     
-                    
-                    
-                    self.R[(s,a)] = -1000000000000
+                        self.R[(s,a)] = 1
+                    else:   
+                        self.R[(s,a)] = 0
                     continue
             
-                    
                 #if going from non-goal to goal-state, award 1                 
                 if(self.T[(a,s)][0][0].p > 5.6) : 
                     self.R[(s, a)] = 1
                 else:
-                    self.R[(s, a)] = -1
+                    self.R[(s, a)] = 0
 
 
 
@@ -150,8 +146,8 @@ class MDP_MountainCar():
                     v_next = -7
                 if (v_next > 7):
                     v_next = 7
-                p_next = round(s.p * v_next / 100.0)
-                
+
+                p_next = round(s.p + v_next / 100.0)
                 if (p_next < -12):
                     p_next = -12
                 if (p_next > 6):
@@ -226,54 +222,7 @@ class SolveMDP:
 
 
 
-    def DP_helper(self, mdp_grid, grid_state, steps_remaining):
-        """
-        Returns optimal value of a dp - state defined by the cell the agent is in and the no. of remaining steps to take.
-        """
- 
-        cell = (grid_state.r, grid_state.c)
-        #Base case
-        if  (steps_remaining == 0):
-            # since no more actions can be taken, this result will be 0
-            self.dp[(cell, steps_remaining)] = 0
-            return self.dp[(cell, steps_remaining)]
- 
-        if  (self.dp[(cell, steps_remaining)] != -100000000000000):
-            #returning pre-solved subproblem answer
-            return self.dp[(cell, steps_remaining)]
-     
-        else:
-            temp = -100000000000000
-            for a in mdp_grid.actions:
-                #first add the current expected reward
-                disc_exp_reward = mdp_grid.R[(grid_state, a)]
-                for (next, prob) in mdp_grid.T[(a, grid_state)]:
-                    # add the expected reward of the future
-                    disc_exp_reward += prob * ( mdp_grid.gamma * self.DP_helper(mdp_grid, next, steps_remaining - 1))
-                temp = np.max([temp, disc_exp_reward])
-            self.dp[(cell, steps_remaining)] = temp
-            return self.dp[(cell, steps_remaining)]
-
                 
-    def DP_FiniteHorizon(self, mdp_grid, num_steps):
-        """
-        Solving the MDP grid world for a finite horizon by DP.
-        Function to optimise the cumulative sum of discounted expected rewards over a given finite horizon for every choice of starting state.
-        """
-        #here dp will store the optimal value of the state given the number of remaining steps.
-        self.dp = {}
-        V       = {}
- 
-        for s in mdp_grid.states:
-            for steps in range(num_steps + 1):
-                self.dp[((s.r, s.c), steps)] = -100000000000000
-
-        for s in mdp_grid.states:
-            V[s] = self.DP_helper(mdp_grid, s, num_steps)
-
-        return (V, self.recover_policy(mdp_grid, V))
-               
-	
 	
     def policy_iteration(self, mdp_grid):
         """
