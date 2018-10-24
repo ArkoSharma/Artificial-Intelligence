@@ -7,6 +7,7 @@
 
 # At most 1 wicket per over - ie either a wicket falls or it doesn't fall and the prob of wicket falling is 6/strike_rate.
 
+# Decide an optimal bowling strategy to handle a real-life match ,ie, given the required configuration ( no of overs remaining per bowler and the no of wickets in hand, decide the choice of the best bowler.)
 
 from __future__ import print_function
 import numpy as np
@@ -72,9 +73,6 @@ def DP(wk_left, b_oversleft):
 
 DP(3, over_left)
 print("Simulating a game::")
-p = []
-for i in range(10):
-    p.append(np.random.uniform(0,1)) #prob of getting out in over i- note these may not add up to 1(these are estimated stuff)
 ol = [2,2,2,2,2] #initially
 wk = 3
 runs = 0.0
@@ -88,8 +86,8 @@ for i in range(10):
     ol[a] -= 1 #reduce overs of the best bowler
     print("next optimal bowler is {} , runs given = {}".format(a,bowler_stats[a][0]))
     runs += bowler_stats[a][0]
-    p = np.random.uniform(0,1)
-    if  (p > p_wk[a]):
+    p = np.random.uniform(0,1) #prob of getting out in over i. Note these may not add up to 1(these should actually be estimates from real statistics of matches.)
+    if  (p > p_wk[a]):         #only if p is greater than p_wk then assume wicket to fall.
         print("wicket falls")
         wk -= 1
         if(wk == 0):
