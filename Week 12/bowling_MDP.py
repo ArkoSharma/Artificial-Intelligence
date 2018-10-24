@@ -84,19 +84,12 @@ for i in range(10):
         break
     print("overs = {}, wickets = {}".format(ol,wk))
     Q = []
-    a     = dpa[(wk, gethash(ol))]
-    if  (ol[a] == 0):
-         for i in range(5):
-             if(ol[i] != 0):
-                  Q.append(bowler_stats[i][0])
-         a = np.argmin(Q)  
-    print(a) 
-    #reduce overs
-    ol[a] -= 1
+    a     = dpa[(wk, gethash(ol))] #choose best bowler
+    ol[a] -= 1 #reduce overs of the best bowler
     print("next optimal bowler is {} , runs given = {}".format(a,bowler_stats[a][0]))
     runs += bowler_stats[a][0]
     p = np.random.uniform(0,1)
-    if  (p < p_wk[a]):
+    if  (p > p_wk[a]):
         print("wicket falls")
         wk -= 1
         if(wk == 0):
@@ -113,11 +106,9 @@ print("total runs = " , runs)
 for (a,b) in dp:
     if(a == 1):
         print("Wickets : {} , Overs Left : {} --- best run = {} , best action = {} ".format(a,b,dp[(a,b)], dpa[(a,b)]))
-
 for (a,b) in dp:
     if(a == 2):
         print("Wickets : {} , Overs Left : {} --- best run = {} , best action = {} ".format(a,b,dp[(a,b)], dpa[(a,b)]))
-
 for (a,b) in dp:
     if(a == 3):
         print("Wickets : {} , Overs Left : {} --- best run = {} , best action = {} ".format(a,b,dp[(a,b)], dpa[(a,b)]))
